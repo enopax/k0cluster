@@ -1,0 +1,31 @@
+apiVersion: k0rdent.mirantis.com/v1beta1
+kind: Management
+metadata:
+  name: kcm
+  namespace: kcm-system
+  labels:
+    k0rdent.mirantis.com/component: kcm
+spec:
+  core:
+    capi: {}
+    kcm:
+      config: {}
+      regional:
+        telemetry:
+          mode: disabled
+  providers:
+  # Only enable providers we need to reduce startup time and resource usage
+  - name: cluster-api-provider-hetzner
+    template: cluster-api-provider-hetzner-0-0-26  # Custom CAPH with diagnostics flags
+  # Commented out unused providers:
+  # - name: cluster-api-provider-docker
+  # - name: cluster-api-provider-azure
+  # - name: cluster-api-provider-vsphere
+  # - name: cluster-api-provider-aws
+  # - name: cluster-api-provider-openstack
+  # - name: cluster-api-provider-gcp
+  # - name: cluster-api-provider-ipam
+  # - name: cluster-api-provider-infoblox
+  - name: cluster-api-provider-k0sproject-k0smotron
+  - name: projectsveltos  # For multi-cluster management
+  release: kcm-1-5-0

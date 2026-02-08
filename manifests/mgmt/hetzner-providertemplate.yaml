@@ -1,0 +1,18 @@
+apiVersion: k0rdent.mirantis.com/v1beta1
+kind: ProviderTemplate
+metadata:
+  name: cluster-api-provider-hetzner-0-0-26
+  labels:
+    k0rdent.mirantis.com/component: kcm
+    app.kubernetes.io/managed-by: Helm
+    helm.toolkit.fluxcd.io/name: cluster-api-provider-hetzner
+    helm.toolkit.fluxcd.io/namespace: kcm-system
+spec:
+  helm:
+    chartSpec:
+      chart: cluster-api-provider-hetzner
+      version: 0.0.26
+      interval: 10m
+      sourceRef:
+        kind: HelmRepository
+        name: custom-repo

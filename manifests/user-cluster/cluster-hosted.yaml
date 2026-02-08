@@ -1,0 +1,89 @@
+apiVersion: k0rdent.mirantis.com/v1beta1
+kind: ClusterDeployment
+metadata:
+  name: cluster-hosted
+  namespace: kcm-system
+spec:
+  template: hetzner-hosted-cp-1-0-0
+  credential: hcloud-cluster-provisioning
+  dryRun: false
+  cleanupOnDeletion: false
+  config:
+    # Worker configuration
+    workersNumber: 2
+
+    # Cluster network
+    clusterNetwork:
+      pods:
+        cidrBlocks:
+          - "10.244.0.0/16"
+      services:
+        cidrBlocks:
+          - "10.96.0.0/12"
+
+    # Optional labels and annotations
+    clusterLabels:
+      cluster-type: hosted-cp
+      environment: dev
+    clusterAnnotations: {}
+
+    # Hetzner region
+    region: fsn1
+
+    # SSH keys for node access (optional)
+    sshKeyNames:
+      - "felix@chump"
+
+    # Hetzner API token reference
+    tokenRef:
+      name: hcloud-cluster-provisioning-token
+      key: hcloud-token
+
+    # Optional: Placement group for anti-affinity
+    placementGroupName: ""
+
+    # Optional: Labels for Hetzner resources
+    labels: {}
+
+    # Worker node configuration
+    worker:
+      image: ubuntu-22.04
+      type: cpx11                      # ~€5/month per worker
+      placementGroupName: ""           # Optional: separate placement group for workers
+      dataDisks: []                    # Optional: additional storage
+      additionalSecurityGroups: []     # Optional: security groups
+
+    # K0smotron control plane configuration
+    k0smotron:
+      controlPlaneNumber: 3            # Number of control plane replicas (pods in mgmt cluster)
+      controllerPlaneFlags: []         # Optional: additional k0s flags
+      service:
+        type: LoadBalancer             # Service type for API access
+        apiPort: 6443                  # Kubernetes API port
+        konnectivityPort: 8132         # Konnectivity port
+
+    # K0s configuration
+    k0s:
+      version: v1.32.6+k0s.0
+      arch: amd64
+      workerArgs: []                   # Optional: additional worker arguments
+      api:
+        extraArgs: {}                  # Optional: additional API server arguments
+      network:                         # Network provider configuration
+        provider: calico
+        calico:
+          mode: vxlan                  # vxlan (recommended for cloud), ipip, or never
+
+    # Authentication configuration (auto-populated by k0rdent)
+    auth:
+      configSecret:
+        name: ""
+        key: "config"
+        hash: ""
+
+    # Data source configuration (auto-populated by k0rdent)
+    dataSource:
+      kineDataSourceSecretName: ""
+      caSecret:
+        name: ""
+        key: "ca.crt"

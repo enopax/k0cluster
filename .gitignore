@@ -1,0 +1,21 @@
+# Custom k0sctl configurations (may contain sensitive server info)
+k0sctl-hetzner-custom.yaml
+k0sctl-*.yaml
+!k0sctl-hetzner.yaml
+
+# kubeconfig files
+kubeconfig
+*.kubeconfig
+
+# Helm downloaded scripts
+get_helm.sh
+
+# Secrets and sensitive data
+# NOTE: Use kubectl create secret instead of editing these files
+*secret*.yaml.bak
+*secret*-custom.yaml
+
+# Helm chart packages (build artifacts)
+*.tgz
+
+
