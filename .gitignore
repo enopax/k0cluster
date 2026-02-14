@@ -19,7 +19,7 @@ get_helm.sh
 *.tgz
 
 # Generated management cluster configurations (contain secrets)
-mgmt/
+/mgmt/
 
 # Environment files with secrets
 .env

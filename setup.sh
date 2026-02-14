@@ -274,8 +274,6 @@ REQUIRED_VARS=(
     "HETZNER_TOKEN_BASE64"
     "CLUSTER_NAME"
     "CLUSTER_NAMESPACE"
-    "CLUSTER_CHART_SOURCE"
-    "PROVIDER_CHART_SOURCE"
 )
 
 for var in "${REQUIRED_VARS[@]}"; do
@@ -299,29 +297,24 @@ if ! command -v helm &> /dev/null; then
     exit 1
 fi
 
-# Ensure Helm charts are packaged (local only, don't push)
-print_info "Ensuring Helm charts are packaged..."
-if [ -x "${SCRIPT_DIR}/package-charts.sh" ]; then
-    "${SCRIPT_DIR}/package-charts.sh" --local | grep -E "(\[INFO\]|\[WARN\]|\[ERROR\])" || true
-    echo ""
-else
-    print_warn "package-charts.sh not found or not executable"
-    print_info "Charts may need to be packaged manually"
-    echo ""
-fi
-
-# Function to process a manifest
-# Usage: process_manifest <source_filename> [dest_filename]
-# If dest_filename is not provided, uses source_filename
-process_manifest() {
+# Function to process a manifest template (with envsubst)
+process_manifest_template() {
     local source_filename=$1
-    local dest_filename=${2:-$1}  # Use source filename if dest not provided
-
     local source_file="${MANIFESTS_DIR}/${source_filename}"
-    local dest_file="${MANIFESTS_OUT_DIR}/${dest_filename}"
+    local dest_file="${MANIFESTS_OUT_DIR}/${source_filename}"
 
-    print_info "Processing ${source_filename}..."
+    print_info "Processing ${source_filename} (template)..."
     envsubst < "${source_file}" > "${dest_file}"
+}
+
+# Function to copy a static manifest (no variable substitution)
+copy_manifest() {
+    local source_filename=$1
+    local source_file="${MANIFESTS_DIR}/${source_filename}"
+    local dest_file="${MANIFESTS_OUT_DIR}/${source_filename}"
+
+    print_info "Copying ${source_filename}..."
+    cp "${source_file}" "${dest_file}"
 }
 
 # Process manifests
@@ -332,23 +325,37 @@ else
 fi
 echo ""
 
-# Define which manifests belong to management cluster
-# These are created once and shared by all workload clusters
-MGMT_MANIFESTS=(
-    "helm-repository.yaml"
-    "hetzner-clustertemplate.yaml"
-    "hetzner-providertemplate.yaml"
-    "credential.yaml"                # Hetzner credentials (shared)
-    "secret.yaml"                    # Hetzner API token (shared)
+# Static manifests (no variable substitution needed)
+STATIC_MANIFESTS=(
+    "management.yaml"                          # k0rdent Management resource
+    "helm-custom-repo.yaml"                    # HelmRepository for custom charts
+    "hetzner-providertemplate.yaml"            # CAPH ProviderTemplate
+    "hetzner-standalone-clustertemplate.yaml"   # Standalone CP ClusterTemplate
+    "hetzner-hosted-clustertemplate.yaml"       # Hosted CP ClusterTemplate
+    "credential.yaml"                          # Hetzner credential reference
 )
 
-# Get list of management template files (for cleanup later)
-TEMPLATE_FILES=("${MGMT_MANIFESTS[@]}")
+# Template manifests (require envsubst for variable substitution)
+TEMPLATE_MANIFESTS=(
+    "secret.yaml"                              # Hetzner API token (needs HETZNER_TOKEN_BASE64)
+)
 
-# Process only management manifests
-for manifest_name in "${MGMT_MANIFESTS[@]}"; do
+# Combined list for orphan cleanup
+MGMT_MANIFESTS=("${STATIC_MANIFESTS[@]}" "${TEMPLATE_MANIFESTS[@]}")
+
+# Copy static manifests
+for manifest_name in "${STATIC_MANIFESTS[@]}"; do
     if [ -f "${MANIFESTS_DIR}/${manifest_name}" ]; then
-        process_manifest "${manifest_name}"
+        copy_manifest "${manifest_name}"
+    else
+        print_warn "Manifest not found: ${manifest_name}"
+    fi
+done
+
+# Process template manifests (envsubst)
+for manifest_name in "${TEMPLATE_MANIFESTS[@]}"; do
+    if [ -f "${MANIFESTS_DIR}/${manifest_name}" ]; then
+        process_manifest_template "${manifest_name}"
     else
         print_warn "Template not found: ${manifest_name}"
     fi
@@ -356,7 +363,7 @@ done
 
 echo ""
 
-# Clean up orphaned manifests (files in manifests dir but not in source templates)
+# Clean up orphaned manifests (files in output dir but not in source manifests)
 if [ "$CLUSTER_EXISTS" = true ] && [ -d "${MANIFESTS_OUT_DIR}" ]; then
     print_info "Checking for orphaned manifests..."
 
@@ -365,8 +372,8 @@ if [ "$CLUSTER_EXISTS" = true ] && [ -d "${MANIFESTS_OUT_DIR}" ]; then
         if [ -f "${manifest_file}" ]; then
             filename=$(basename "${manifest_file}")
 
-            # Check if this file exists in templates
-            if [[ ! " ${TEMPLATE_FILES[@]} " =~ " ${filename} " ]]; then
+            # Check if this file exists in the manifest list
+            if [[ ! " ${MGMT_MANIFESTS[@]} " =~ " ${filename} " ]]; then
                 print_warn "Removing orphaned manifest: ${filename}"
                 rm -f "${manifest_file}"
                 REMOVED_COUNT=$((REMOVED_COUNT + 1))
