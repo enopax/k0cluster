@@ -23,7 +23,7 @@ usage() {
     echo "Deletes a management cluster and its configuration."
     echo ""
     echo "This will:"
-    echo "  - Delete the management cluster (kind or hetzner)"
+    echo "  - Delete the management cluster (kind or hcloud)"
     echo "  - Remove local configuration directory"
     echo "  - Clean up kubectl context"
     echo "  - Optionally remove user cluster configurations"
@@ -117,8 +117,8 @@ if [ "$USER_CLUSTER_COUNT" -gt 0 ]; then
         kind)
             CONTEXT_NAME="kind-${MGMT_NAME}"
             ;;
-        hetzner)
-            CONTEXT_NAME="hetzner-${MGMT_NAME}"
+        hcloud)
+            CONTEXT_NAME="hcloud-${MGMT_NAME}"
             ;;
         *)
             CONTEXT_NAME=""
@@ -131,7 +131,7 @@ if [ "$USER_CLUSTER_COUNT" -gt 0 ]; then
             kubectl config use-context "${CONTEXT_NAME}" &>/dev/null
         else
             print_warn "Management cluster context not found: ${CONTEXT_NAME}"
-            print_warn "User clusters may not be deleted from Hetzner"
+            print_warn "User clusters may not be deleted from Hetzner Cloud"
         fi
     fi
 
@@ -188,11 +188,11 @@ case "$CLUSTER_TYPE" in
         fi
         ;;
 
-    hetzner)
-        CONTEXT_NAME="hetzner-${MGMT_NAME}"
+    hcloud)
+        CONTEXT_NAME="hcloud-${MGMT_NAME}"
 
-        print_warn "Hetzner management cluster detected"
-        print_warn "IMPORTANT: You must manually delete the Hetzner VM running k0s"
+        print_warn "Hetzner Cloud management cluster detected"
+        print_warn "IMPORTANT: You must manually delete the Hetzner Cloud VM running k0s"
         print_info "The script will remove the kubectl context"
         echo ""
 
@@ -236,7 +236,7 @@ fi
 
 # Check if we need to switch kubectl context
 CURRENT_CONTEXT=$(kubectl config current-context 2>/dev/null || echo "")
-if [ "$CURRENT_CONTEXT" = "kind-${MGMT_NAME}" ] || [ "$CURRENT_CONTEXT" = "hetzner-${MGMT_NAME}" ]; then
+if [ "$CURRENT_CONTEXT" = "kind-${MGMT_NAME}" ] || [ "$CURRENT_CONTEXT" = "hcloud-${MGMT_NAME}" ]; then
     print_warn "Current kubectl context was deleted"
     print_info "Available contexts:"
     kubectl config get-contexts -o name 2>/dev/null | sed 's/^/  - /'

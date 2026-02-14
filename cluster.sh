@@ -67,7 +67,7 @@ get_active_mgmt_cluster() {
 
     # No provider matched
     print_error "Cannot determine management cluster from context: $context"
-    print_info "Context doesn't match any known provider pattern (kind-*, hetzner-*, etc.)"
+    print_info "Context doesn't match any known provider pattern (kind-*, hcloud-*, etc.)"
     print_info ""
     print_info "Available management clusters:"
     ls -1 "${SCRIPT_DIR}/mgmt" 2>/dev/null || echo "  (none)"

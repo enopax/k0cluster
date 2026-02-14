@@ -132,8 +132,8 @@ setup_management_cluster() {
     if ! k0rdent_installed; then
         print_info "k0rdent not found, attempting installation..."
         if ! install_k0rdent; then
-            # For hetzner, this is expected and we continue
-            if [ "${MGMT_CLUSTER_TYPE}" = "hetzner" ]; then
+            # For hcloud, this is expected and we continue
+            if [ "${MGMT_CLUSTER_TYPE}" = "hcloud" ]; then
                 print_warn "k0rdent not installed on remote cluster"
                 print_info "Please install k0rdent before deploying workload clusters"
             else
@@ -156,7 +156,7 @@ PROVIDER_SCRIPT="${SCRIPT_DIR}/scripts/provider/${MGMT_CLUSTER_TYPE}.sh"
 
 if [ ! -f "${PROVIDER_SCRIPT}" ]; then
     print_error "Invalid MGMT_CLUSTER_TYPE: ${MGMT_CLUSTER_TYPE}"
-    print_info "Must be 'kind' or 'hetzner' in ${ENV_FILE}"
+    print_info "Must be 'kind' or 'hcloud' in ${ENV_FILE}"
     print_info "Provider script not found: ${PROVIDER_SCRIPT}"
     exit 1
 fi

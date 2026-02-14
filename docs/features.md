@@ -96,7 +96,7 @@ MGMT_CLUSTER_TYPE=kind
 - Configures kubectl context
 - No manual intervention required
 
-#### hetzner (Remote Production)
+#### hcloud (Remote Production)
 
 **Description**: Remote k0s clusters on Hetzner VMs
 
@@ -114,7 +114,7 @@ MGMT_CLUSTER_TYPE=kind
 
 **Configuration**:
 ```bash
-MGMT_CLUSTER_TYPE=hetzner
+MGMT_CLUSTER_TYPE=hcloud
 ```
 
 **Manual Setup Required**:
@@ -599,8 +599,8 @@ Automatic kubectl context management with consistent naming.
 **Examples**:
 - `kind-production`
 - `kind-dev`
-- `hetzner-prod-eu`
-- `hetzner-staging`
+- `hcloud-prod-eu`
+- `hcloud-staging`
 
 ### Automatic Switching
 
@@ -616,10 +616,10 @@ switch_context() {
     print_info "Using kubectl context: ${context_name}"
 }
 
-# hetzner provider
+# hcloud provider
 switch_context() {
     local cluster_name=$1
-    local context_name="hetzner-${cluster_name}"
+    local context_name="hcloud-${cluster_name}"
 
     if ! kubectl config get-contexts "${context_name}" &>/dev/null; then
         print_error "kubectl context not found: ${context_name}"
@@ -738,7 +738,7 @@ Clear visual feedback using colored messages:
 **Pre-Flight Checks**:
 - Tool availability (kubectl, helm, envsubst, yq)
 - Configuration validity (required variables)
-- Context existence (for hetzner provider)
+- Context existence (for hcloud provider)
 - Token detection (hcloud or manual)
 
 **Error Messages**:
@@ -832,7 +832,7 @@ $ ./setup.sh
 
 ## Feature Comparison
 
-| Feature | kind Provider | hetzner Provider |
+| Feature | kind Provider | hcloud Provider |
 |---------|--------------|------------------|
 | Automatic cluster creation | ✅ | ❌ (manual) |
 | Auto k0rdent install | ✅ | ❌ (manual) |

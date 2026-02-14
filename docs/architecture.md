@@ -31,7 +31,7 @@ The system is designed around three core principles:
 │  Functions   │  │   Scripts   │  │              │
 │              │  │             │  │ mgmt/*/      │
 │ common.sh    │  │  kind.sh    │  │   .env       │
-│              │  │ hetzner.sh  │  │ mgmt/*/      │
+│              │  │ hcloud.sh   │  │ mgmt/*/      │
 │ - print_*    │  │             │  │ clusters/*/  │
 │ - colors     │  │ - setup     │  │   .env       │
 └──────────────┘  │ - validate  │  └──────────────┘
@@ -161,10 +161,10 @@ install_k0rdent()
 - **Context**: `kind-<cluster-name>`
 - **Auto-installs**: k0rdent via Helm
 
-##### hetzner.sh
+##### hcloud.sh
 - **Purpose**: Manage remote k0s clusters on Hetzner VMs
 - **Requires**: Pre-configured kubectl context
-- **Context**: `hetzner-<cluster-name>`
+- **Context**: `hcloud-<cluster-name>`
 - **Manual setup**: k0rdent must be installed manually
 
 #### Provider Selection
@@ -172,7 +172,7 @@ install_k0rdent()
 ```bash
 # In cluster/<name>/.env
 MGMT_CLUSTER_TYPE=kind     # Uses scripts/provider/kind.sh
-MGMT_CLUSTER_TYPE=hetzner  # Uses scripts/provider/hetzner.sh
+MGMT_CLUSTER_TYPE=hcloud   # Uses scripts/provider/hcloud.sh
 ```
 
 The deploy script dynamically loads the appropriate provider:
@@ -228,7 +228,7 @@ mgmt/<mgmt-name>/        # e.g., "test" or "prod"
 
 ```bash
 # Management cluster provider
-MGMT_CLUSTER_TYPE=kind       # kind or hetzner
+MGMT_CLUSTER_TYPE=kind       # kind or hcloud
 
 # Shared Hetzner credentials
 HETZNER_TOKEN_BASE64=...
@@ -387,7 +387,7 @@ fi
 ┌─────────────────────────┐
 │ Source provider script  │
 │ - scripts/provider/     │
-│   kind.sh or hetzner.sh │
+│   kind.sh or hcloud.sh  │
 └──────┬──────────────────┘
        │
        ▼
@@ -585,7 +585,7 @@ Each cluster uses a unique kubectl context:
 ```
 kind-production      # Local kind cluster for 'production'
 kind-dev            # Local kind cluster for 'dev'
-hetzner-prod-eu     # Remote cluster for 'prod-eu'
+hcloud-prod-eu      # Remote cluster for 'prod-eu'
 ```
 
 This prevents accidental operations on wrong clusters.

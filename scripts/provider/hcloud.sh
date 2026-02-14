@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Hetzner Management Cluster Provider
-# Provider-specific functions for managing remote k0s clusters on Hetzner VMs as k0rdent management clusters
+# Hetzner Cloud Management Cluster Provider
+# Provider-specific functions for managing remote k0s clusters on Hetzner Cloud VMs as k0rdent management clusters
 # Common functions and orchestration are handled by deploy.sh
 
 set -e
@@ -20,13 +20,13 @@ cluster_exists() {
     kubectl config get-contexts "${context_name}" &>/dev/null
 }
 
-# Get kubectl context name for hetzner cluster (provider-specific)
+# Get kubectl context name for hcloud cluster (provider-specific)
 get_context_name() {
     local cluster_name=$1
-    echo "hetzner-${cluster_name}"
+    echo "hcloud-${cluster_name}"
 }
 
-# Switch to hetzner cluster context (provider-specific)
+# Switch to hcloud cluster context (provider-specific)
 switch_context() {
     local cluster_name=$1
     local context_name=$(get_context_name "${cluster_name}")
@@ -39,7 +39,7 @@ switch_context() {
         print_info "Available contexts:"
         kubectl config get-contexts -o name
         print_info ""
-        print_info "Please create kubectl context for your Hetzner k0s management cluster:"
+        print_info "Please create kubectl context for your Hetzner Cloud k0s management cluster:"
         print_info "  kubectl config set-context ${context_name} --cluster=... --user=..."
         return 1
     fi
@@ -52,27 +52,27 @@ switch_context() {
     return 0
 }
 
-# Hetzner clusters are manually provisioned (provider-specific)
+# Hetzner Cloud clusters are manually provisioned (provider-specific)
 create_cluster() {
     local cluster_name=$1
     local context_name=$(get_context_name "${cluster_name}")
 
     if ! cluster_exists "${cluster_name}"; then
-        print_error "Hetzner management cluster not configured"
-        print_info "Please create a k0s cluster on Hetzner and configure kubectl context:"
+        print_error "Hetzner Cloud management cluster not configured"
+        print_info "Please create a k0s cluster on Hetzner Cloud and configure kubectl context:"
         print_info "  kubectl config set-context ${context_name} --cluster=... --user=..."
         return 1
     fi
 
-    print_info "Using existing Hetzner cluster: ${cluster_name}"
+    print_info "Using existing Hetzner Cloud cluster: ${cluster_name}"
     return 0
 }
 
 # Parse management cluster name from kubectl context (provider-specific)
-# Returns: mgmt_name if context matches hetzner pattern, empty otherwise
+# Returns: mgmt_name if context matches hcloud pattern, empty otherwise
 parse_context_name() {
     local context=$1
-    if [[ "$context" =~ ^hetzner-(.+)$ ]]; then
+    if [[ "$context" =~ ^hcloud-(.+)$ ]]; then
         echo "${BASH_REMATCH[1]}"
         return 0
     fi
@@ -82,13 +82,13 @@ parse_context_name() {
 # Check if this provider owns the given context (provider-specific)
 owns_context() {
     local context=$1
-    [[ "$context" =~ ^hetzner- ]]
+    [[ "$context" =~ ^hcloud- ]]
 }
 
-# Install k0rdent (provider-specific - Hetzner requires manual installation)
+# Install k0rdent (provider-specific - Hetzner Cloud requires manual installation)
 install_k0rdent() {
-    print_warn "k0rdent not found on Hetzner cluster"
-    print_info "Please install k0rdent manually on your Hetzner management cluster:"
+    print_warn "k0rdent not found on Hetzner Cloud cluster"
+    print_info "Please install k0rdent manually on your Hetzner Cloud management cluster:"
     print_info "  helm install kcm oci://ghcr.io/k0rdent/kcm/charts/kcm --version 1.5.0 -n kcm-system --create-namespace"
     return 1
 }

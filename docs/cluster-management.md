@@ -316,7 +316,7 @@ kubectl config use-context production
 
 ```bash
 # 1. Ensure management cluster is active
-kubectl config current-context  # Should be kind-test or hetzner-test
+kubectl config current-context  # Should be kind-test or hcloud-test
 
 # 2. Create user cluster manifests
 ./cluster.sh create my-app
@@ -397,7 +397,7 @@ kubectl config use-context kind-test
 ./cluster.sh deploy dev-app
 
 # Management cluster: prod (remote Hetzner)
-kubectl config use-context hetzner-prod
+kubectl config use-context hcloud-prod
 ./cluster.sh list             # Shows workload clusters managed by 'prod'
 ./cluster.sh create prod-app
 ./cluster.sh deploy prod-app
@@ -411,12 +411,12 @@ The script automatically detects the active management cluster from kubectl cont
 
 ```bash
 # Context: kind-test → Management cluster: test
-# Context: hetzner-prod → Management cluster: prod
+# Context: hcloud-prod → Management cluster: prod
 ```
 
 **Format**:
 - kind clusters: `kind-<mgmt-name>`
-- hetzner clusters: `hetzner-<mgmt-name>`
+- hcloud clusters: `hcloud-<mgmt-name>`
 
 ### Workload Cluster Configuration
 
@@ -510,14 +510,14 @@ hcloud server describe my-app-control-plane-0
 kubectl config get-contexts
 
 # Use management cluster context
-kubectl config use-context kind-test   # or hetzner-test
+kubectl config use-context kind-test   # or hcloud-test
 ```
 
 ### "Cannot determine management cluster from context"
 
 **Problem**: Context name doesn't match expected format
 
-**Expected**: `kind-<name>` or `hetzner-<name>`
+**Expected**: `kind-<name>` or `hcloud-<name>`
 
 **Solution**:
 ```bash
@@ -614,7 +614,7 @@ cat mgmt/test/clusters/my-app/.env
 ./cluster.sh deploy my-test-app
 
 # Verify it works, then use production management cluster
-kubectl config use-context hetzner-prod
+kubectl config use-context hcloud-prod
 ./cluster.sh create production-app
 ./cluster.sh deploy production-app
 ```
