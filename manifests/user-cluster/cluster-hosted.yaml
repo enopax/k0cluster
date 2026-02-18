@@ -12,6 +12,12 @@ spec:
     # Worker configuration
     workersNumber: 2
 
+    # Hosted control plane (runs as pods in management cluster)
+    controlPlane:
+      replicas: 1
+      service:
+        type: ClusterIP
+
     # Cluster network
     clusterNetwork:
       pods:
@@ -27,10 +33,10 @@ spec:
       environment: dev
     clusterAnnotations: {}
 
-    # Hetzner region
-    region: fsn1
+    # Hetzner region (fsn1 unavailable, use nbg1)
+    region: nbg1
 
-    # SSH keys for node access (optional)
+    # SSH keys for node access
     sshKeyNames:
       - "felix@chump"
 
@@ -39,51 +45,20 @@ spec:
       name: hcloud-cluster-provisioning-token
       key: hcloud-token
 
-    # Optional: Placement group for anti-affinity
-    placementGroupName: ""
-
-    # Optional: Labels for Hetzner resources
-    labels: {}
+    # Hetzner private network
+    hcloudNetwork:
+      enabled: true
+      cidrBlock: "10.0.0.0/16"
+      subnetCidrBlock: "10.0.0.0/24"
+      networkZone: "eu-central"
 
     # Worker node configuration
     worker:
-      image: ubuntu-22.04
-      type: cpx11                      # ~€5/month per worker
-      placementGroupName: ""           # Optional: separate placement group for workers
-      dataDisks: []                    # Optional: additional storage
-      additionalSecurityGroups: []     # Optional: security groups
+      image: ubuntu-24.04
+      type: cpx22
 
-    # K0smotron control plane configuration
-    k0smotron:
-      controlPlaneNumber: 3            # Number of control plane replicas (pods in mgmt cluster)
-      controllerPlaneFlags: []         # Optional: additional k0s flags
-      service:
-        type: LoadBalancer             # Service type for API access
-        apiPort: 6443                  # Kubernetes API port
-        konnectivityPort: 8132         # Konnectivity port
-
-    # K0s configuration
+    # k0s configuration
     k0s:
-      version: v1.32.6+k0s.0
-      arch: amd64
-      workerArgs: []                   # Optional: additional worker arguments
-      api:
-        extraArgs: {}                  # Optional: additional API server arguments
-      network:                         # Network provider configuration
-        provider: calico
-        calico:
-          mode: vxlan                  # vxlan (recommended for cloud), ipip, or never
-
-    # Authentication configuration (auto-populated by k0rdent)
-    auth:
-      configSecret:
-        name: ""
-        key: "config"
-        hash: ""
-
-    # Data source configuration (auto-populated by k0rdent)
-    dataSource:
-      kineDataSourceSecretName: ""
-      caSecret:
-        name: ""
-        key: "ca.crt"
+      version: v1.34.3+k0s.0
+      network:
+        provider: custom
