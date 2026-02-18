@@ -1,13 +1,13 @@
 apiVersion: k0rdent.mirantis.com/v1beta1
 kind: ClusterTemplate
 metadata:
-  name: hetzner-hosted-cp-1-0-0
+  name: hetzner-hosted-cp-1-1-0
   namespace: kcm-system
 spec:
   helm:
     chartSpec:
       chart: hetzner-hosted-cp
-      version: 1.0.0
+      version: 1.1.0
       interval: 10m
       sourceRef:
         kind: HelmRepository

@@ -4,7 +4,7 @@ metadata:
   name: cluster-hosted
   namespace: kcm-system
 spec:
-  template: hetzner-hosted-cp-1-0-0
+  template: hetzner-hosted-cp-1-1-0
   credential: hcloud-cluster-provisioning
   dryRun: false
   cleanupOnDeletion: false
@@ -13,10 +13,15 @@ spec:
     workersNumber: 2
 
     # Hosted control plane (runs as pods in management cluster)
+    # NodePort mode: workers connect via management cluster LB IP
     controlPlane:
       replicas: 1
       service:
-        type: ClusterIP
+        type: NodePort
+        apiNodePort: 30443
+        konnectivityNodePort: 30132
+      endpoint:
+        host: "46.225.33.0"  # Management cluster load balancer IP
 
     # Cluster network
     clusterNetwork:
@@ -33,7 +38,7 @@ spec:
       environment: dev
     clusterAnnotations: {}
 
-    # Hetzner region (fsn1 unavailable, use nbg1)
+    # Hetzner region
     region: nbg1
 
     # SSH keys for node access
