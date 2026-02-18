@@ -11,5 +11,5 @@ spec:
       interval: 10m
       sourceRef:
         kind: HelmRepository
-        name: custom-repo
+        name: hetzner-standalone-cp-repo
 
