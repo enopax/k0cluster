@@ -4,24 +4,20 @@ metadata:
   name: cluster-hosted
   namespace: kcm-system
 spec:
-  template: hetzner-hosted-cp-1-1-0
+  template: hetzner-hosted-cp-1-2-0
   credential: hcloud-cluster-provisioning
   dryRun: false
   cleanupOnDeletion: false
   config:
     # Worker configuration
-    workersNumber: 2
+    workersNumber: 1
 
     # Hosted control plane (runs as pods in management cluster)
-    # NodePort mode: workers connect via management cluster LB IP
+    # LoadBalancer mode: Hetzner CCM provisions a dedicated LB
     controlPlane:
       replicas: 1
       service:
-        type: NodePort
-        apiNodePort: 30443
-        konnectivityNodePort: 30132
-      endpoint:
-        host: "46.225.33.0"  # Management cluster load balancer IP
+        type: LoadBalancer
 
     # Cluster network
     clusterNetwork:
@@ -32,11 +28,10 @@ spec:
         cidrBlocks:
           - "10.96.0.0/12"
 
-    # Optional labels and annotations
+    # Labels
     clusterLabels:
       cluster-type: hosted-cp
       environment: dev
-    clusterAnnotations: {}
 
     # Hetzner region
     region: nbg1
@@ -48,7 +43,7 @@ spec:
     # Hetzner API token reference
     tokenRef:
       name: hcloud-cluster-provisioning-token
-      key: hcloud-token
+      key: HCLOUD_TOKEN
 
     # Hetzner private network
     hcloudNetwork:
