@@ -18,4 +18,11 @@ get_helm.sh
 # Helm chart packages (build artifacts)
 *.tgz
 
+# Generated management cluster configurations (contain secrets)
+/mgmt/
 
+# Environment files with secrets
+.env
+.env.*
+*.env
+!.env.example

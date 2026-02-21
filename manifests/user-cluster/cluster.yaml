@@ -1,0 +1,23 @@
+apiVersion: k0rdent.mirantis.com/v1beta1
+kind: ClusterDeployment
+metadata:
+  name: ${CLUSTER_NAME}
+  namespace: ${CLUSTER_NAMESPACE}
+spec:
+  template: ${CLUSTER_CHART_NAME}
+  credential: hetzner-cluster-identity-cred
+  dryRun: false
+  config:
+    clusterLabels: {}
+    controlPlaneNumber: ${CONTROL_PLANE_COUNT}
+    workersNumber: ${WORKER_COUNT}
+    region: "${HETZNER_REGION}"
+    controlPlane:
+      type: ${CONTROL_PLANE_MACHINE_TYPE}
+    worker:
+      type: ${WORKER_MACHINE_TYPE}
+    controlPlaneConfig:
+      downloadURL: "${K0S_DOWNLOAD_URL}"
+      k0s:
+        version: ${K0S_VERSION}
+        arch: amd64
