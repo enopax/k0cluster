@@ -1,0 +1,6 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - cluster-01.yaml
+  - cluster-hosted.yaml
+  # cluster.yaml intentionally excluded: uses ${envsubst} placeholders

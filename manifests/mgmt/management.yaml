@@ -28,4 +28,4 @@ spec:
   # - name: cluster-api-provider-infoblox
   - name: cluster-api-provider-k0sproject-k0smotron
   - name: projectsveltos  # For multi-cluster management
-  release: kcm-1-5-0
+  release: kcm-1-7-0
