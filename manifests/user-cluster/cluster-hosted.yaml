@@ -4,61 +4,45 @@ metadata:
   name: cluster-hosted
   namespace: kcm-system
 spec:
-  template: hetzner-hosted-cp-1-2-0
+  template: hetzner-hosted-cp-1-3-0
   credential: hcloud-cluster-provisioning
   dryRun: false
   cleanupOnDeletion: false
   config:
-    # Worker configuration
-    workersNumber: 1
-
-    # Hosted control plane (runs as pods in management cluster)
-    # LoadBalancer mode: Hetzner CCM provisions a dedicated LB
-    controlPlane:
-      replicas: 1
-      service:
-        type: LoadBalancer
-
-    # Cluster network
-    clusterNetwork:
-      pods:
-        cidrBlocks:
-          - "10.244.0.0/16"
-      services:
-        cidrBlocks:
-          - "10.96.0.0/12"
-
-    # Labels
-    clusterLabels:
-      cluster-type: hosted-cp
-      environment: dev
+    clusterName: cluster-hosted
 
     # Hetzner region
     region: nbg1
 
-    # SSH keys for node access
-    sshKeyNames:
-      - "felix@chump"
+    # SSH key for node access (single key name, not array)
+    sshKeyName: "deploy"
 
-    # Hetzner API token reference
-    tokenRef:
-      name: hcloud-cluster-provisioning-token
-      key: HCLOUD_TOKEN
+    # Hetzner API token secret name
+    hetznerSecretName: hetzner
 
-    # Hetzner private network
-    hcloudNetwork:
-      enabled: true
-      cidrBlock: "10.0.0.0/16"
-      subnetCidrBlock: "10.0.0.0/24"
-      networkZone: "eu-central"
+    # Cluster network
+    clusterNetwork:
+      pods:
+        cidrBlock: "10.244.0.0/16"
+      services:
+        cidrBlock: "10.96.0.0/12"
 
     # Worker node configuration
     worker:
-      image: ubuntu-24.04
-      type: cpx22
+      serverType: cpx22
+      imageName: ubuntu-24.04
+      replicas: 1
+
+    # Ingress for hosted control plane access
+    ingress:
+      enabled: true
+      apiHost: cluster-hosted-api.k0s.targz.de
+      konnectivityHost: cluster-hosted-konnectivity.k0s.targz.de
+      className: haproxy
+      port: 443
+      annotations:
+        haproxy.org/ssl-passthrough: "true"
 
     # k0s configuration
     k0s:
-      version: v1.34.3+k0s.0
-      network:
-        provider: custom
+      version: v1.35.4+k0s.0
