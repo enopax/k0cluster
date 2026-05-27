@@ -16,7 +16,7 @@ spec:
   providers:
   # Only enable providers we need to reduce startup time and resource usage
   - name: cluster-api-provider-hetzner
-    template: cluster-api-provider-hetzner-0-0-26  # Custom CAPH with diagnostics flags
+    template: cluster-api-provider-hetzner-0-0-27  # Custom CAPH with diagnostics flags
   # Commented out unused providers:
   # - name: cluster-api-provider-docker
   # - name: cluster-api-provider-azure
@@ -28,4 +28,4 @@ spec:
   # - name: cluster-api-provider-infoblox
   - name: cluster-api-provider-k0sproject-k0smotron
   - name: projectsveltos  # For multi-cluster management
-  release: kcm-1-5-0
+  release: kcm-1-9-0
