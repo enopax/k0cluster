@@ -4,7 +4,7 @@ metadata:
   name: cluster-hosted
   namespace: kcm-system
 spec:
-  template: hetzner-hosted-cp-1-3-0
+  template: hetzner-hosted-cp-1-3-13
   credential: hcloud-cluster-provisioning
   dryRun: false
   cleanupOnDeletion: false
@@ -14,11 +14,8 @@ spec:
     # Hetzner region
     region: nbg1
 
-    # SSH key for node access (single key name, not array)
-    sshKeyName: "deploy"
-
-    # Hetzner API token secret name
-    hetznerSecretName: hetzner
+    # SSH key for node access
+    sshKeyName: deploy
 
     # Cluster network
     clusterNetwork:
@@ -33,15 +30,11 @@ spec:
       imageName: ubuntu-24.04
       replicas: 1
 
-    # Ingress for hosted control plane access
+    # Control plane access via ingress
     ingress:
       enabled: true
       apiHost: cluster-hosted-api.k0s.targz.de
       konnectivityHost: cluster-hosted-konnectivity.k0s.targz.de
-      className: haproxy
-      port: 443
-      annotations:
-        haproxy.org/ssl-passthrough: "true"
 
     # k0s configuration
     k0s:
