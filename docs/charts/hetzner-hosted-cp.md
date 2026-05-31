@@ -93,8 +93,59 @@ Before deploying, ensure you have:
 3. **k0smotron provider** deployed
 4. **Hetzner API token** stored as a Secret
 5. **SSH keys** registered in Hetzner Cloud (optional)
+6. **Sveltos resource template** ConfigMap applied (see below)
 
 See [Setup Management Cluster](../getting-started/setup-kind.md) for details.
+
+## Hcloud Secret Propagation (Sveltos)
+
+In hosted CP mode, the hcloud-cloud-controller-manager (CCM) running in the
+child cluster needs an `hcloud` secret in `kube-system` containing the Hetzner
+API token. Unlike standalone CP mode (where CAPH propagates the secret via
+`hcloudTokenRef`), **CAPH does not propagate secrets to child clusters in
+hosted CP mode**. Instead, **Sveltos** handles this.
+
+### How It Works
+
+1. k0rdent auto-generates a Sveltos `Profile` for each ClusterDeployment
+2. The Profile references a ConfigMap named
+   `<credential-secret-name>-resource-template` (e.g.
+   `hcloud-cluster-provisioning-token-resource-template`)
+3. The ConfigMap contains a Sveltos template that reads the Hetzner API token
+   from the credential secret and creates an `hcloud` secret in the child
+   cluster's `kube-system` namespace
+4. The CCM then reads the token from this secret
+
+### Required ConfigMap
+
+The following ConfigMap **must** exist in `kcm-system` before deploying a
+cluster. Apply it from `manifests/mgmt/hetzner-resource-template.yaml`:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hcloud-cluster-provisioning-token-resource-template
+  namespace: kcm-system
+  annotations:
+    projectsveltos.io/template: "true"
+data:
+  hcloud-secret.yaml: |
+    {{- $identity := (getResource "InfrastructureProviderIdentity") -}}
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: hcloud
+      namespace: kube-system
+    type: Opaque
+    data:
+      token: {{ index $identity.data "HCLOUD_TOKEN" }}
+```
+
+**Important:** The ConfigMap name must match the pattern
+`<credential-secret-name>-resource-template`. If your credential secret is
+named `hcloud-cluster-provisioning-token`, the ConfigMap must be named
+`hcloud-cluster-provisioning-token-resource-template`.
 
 ## Configuration
 
@@ -393,6 +444,7 @@ kubectl get svc -n kcm-system
 **Symptoms:**
 - Worker nodes not getting external IPs
 - LoadBalancer services in user cluster not working
+- CCM pods stuck in `ContainerCreating` or `CrashLoopBackOff`
 
 **Check:**
 ```bash
@@ -401,9 +453,18 @@ kubectl --kubeconfig <cluster>.kubeconfig get pods -n kube-system | grep hcloud
 
 # Check CCM logs
 kubectl --kubeconfig <cluster>.kubeconfig logs -n kube-system -l app.kubernetes.io/name=hcloud-cloud-controller-manager
+
+# Check if the hcloud secret exists
+kubectl --kubeconfig <cluster>.kubeconfig get secret hcloud -n kube-system
 ```
 
 **Common causes:**
+- **Missing `hcloud` secret in child cluster** — the Sveltos resource template
+  ConfigMap is not applied. See [Hcloud Secret Propagation](#hcloud-secret-propagation-sveltos).
+  Verify the ConfigMap exists:
+  ```bash
+  kubectl get configmap hcloud-cluster-provisioning-token-resource-template -n kcm-system
+  ```
 - Hetzner API token not accessible
 - Token doesn't have required permissions
 - Network policy blocking access
