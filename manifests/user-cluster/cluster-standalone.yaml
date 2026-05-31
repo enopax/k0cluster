@@ -1,10 +1,10 @@
 apiVersion: k0rdent.mirantis.com/v1beta1
 kind: ClusterDeployment
 metadata:
-  name: cluster01
+  name: cluster-standalone
   namespace: kcm-system
 spec:
-  template: hetzner-standalone-cp-1-0-17
+  template: hetzner-standalone-cp-1-0-18
   credential: hcloud-cluster-provisioning
   dryRun: false
   cleanupOnDeletion: false
