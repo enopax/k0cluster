@@ -4,7 +4,7 @@ metadata:
   name: cluster01
   namespace: kcm-system
 spec:
-  template: hetzner-standalone-cp
+  template: hetzner-standalone-cp-1-0-17
   credential: hcloud-cluster-provisioning
   dryRun: false
   cleanupOnDeletion: false
