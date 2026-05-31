@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: hetzner-resource-template
+  name: hcloud-cluster-provisioning-token-resource-template
   namespace: kcm-system
   labels:
     k0rdent.mirantis.com/component: kcm
@@ -17,4 +17,4 @@ data:
       namespace: kube-system
     type: Opaque
     data:
-      token: {{ index $identity.data "hcloud" }}
+      token: {{ index $identity.data "HCLOUD_TOKEN" }}
