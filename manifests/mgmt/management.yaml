@@ -9,10 +9,10 @@ spec:
   core:
     capi: {}
     kcm:
-      config: {}
-      regional:
-        telemetry:
-          mode: disabled
+      config:
+        regional:
+          telemetry:
+            mode: disabled
   providers:
   # Only enable providers we need to reduce startup time and resource usage
   - name: cluster-api-provider-hetzner
