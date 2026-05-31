@@ -23,11 +23,11 @@ spec:
     region: fsn1
     
     sshKeyNames:
-      - "felix@chump"
+      - "deploy"
     
     tokenRef:
       name: hcloud-cluster-provisioning-token
-      key: hcloud-token
+      key: HCLOUD_TOKEN
     placementGroupName: ""
     labels: {}
     
@@ -36,14 +36,14 @@ spec:
 
     controlPlane:
       image: ubuntu-24.04
-      type: cpx11
+      type: cpx22
       placementGroupName: ""
       dataDisks: []
       additionalSecurityGroups: []
 
     worker:
       image: ubuntu-24.04
-      type: cpx11
+      type: cpx22
       placementGroupName: ""
       dataDisks: []
       additionalSecurityGroups: []
