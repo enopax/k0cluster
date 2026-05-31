@@ -35,14 +35,14 @@ spec:
       extraServices: []
 
     controlPlane:
-      image: ubuntu-22.04
+      image: ubuntu-24.04
       type: cpx11
       placementGroupName: ""
       dataDisks: []
       additionalSecurityGroups: []
 
     worker:
-      image: ubuntu-22.04
+      image: ubuntu-24.04
       type: cpx11
       placementGroupName: ""
       dataDisks: []
