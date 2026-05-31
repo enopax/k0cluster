@@ -1,0 +1,73 @@
+apiVersion: k0rdent.mirantis.com/v1beta1
+kind: ClusterDeployment
+metadata:
+  name: cluster01
+  namespace: kcm-system
+spec:
+  template: hetzner-standalone-cp
+  credential: hcloud-cluster-provisioning
+  dryRun: false
+  cleanupOnDeletion: false
+  config:
+    controlPlaneNumber: 1
+    workersNumber: 1
+    clusterNetwork: 
+      pods: 
+        cidrBlocks:
+          - "10.244.0.0/16"
+      services:
+        cidrBlocks:
+          - "10.96.0.0/12"
+    clusterLabels: {}
+    clusterAnnotations: {}
+    region: fsn1
+    
+    sshKeyNames:
+      - "felix@chump"
+    
+    tokenRef:
+      name: hcloud-cluster-provisioning-token
+      key: hcloud-token
+    placementGroupName: ""
+    labels: {}
+    
+    controlPlaneLoadBalancer:
+      extraServices: []
+
+    controlPlane:
+      image: ubuntu-22.04
+      type: cpx11
+      placementGroupName: ""
+      dataDisks: []
+      additionalSecurityGroups: []
+
+    worker:
+      image: ubuntu-22.04
+      type: cpx11
+      placementGroupName: ""
+      dataDisks: []
+      additionalSecurityGroups: []
+
+    k0s:
+      version: v1.32.6+k0s.0
+      arch: amd64
+      auth:
+        enabled: false
+        config: {}
+      api:
+        extraArgs: {}
+      network: {}
+      files: []
+    controlPlaneConfig:
+      args:
+        - --labels="kca/control-plane=true"
+      downloadURL: "https://github.com/k0sproject/k0s/releases/download/v1.32.6+k0s.0/k0s-v1.32.6+k0s.0-amd64"
+      k0s: {}
+      postStartCommands: []
+      preInstallCommands: []
+
+    workerConfig:
+      postStartCommands: []
+      preInstallCommands: []
+
+    nodeClasses: []
