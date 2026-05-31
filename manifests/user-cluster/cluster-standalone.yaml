@@ -49,7 +49,7 @@ spec:
       additionalSecurityGroups: []
 
     k0s:
-      version: v1.32.6+k0s.0
+      version: v1.35.4+k0s.0
       arch: amd64
       auth:
         enabled: false
@@ -61,7 +61,7 @@ spec:
     controlPlaneConfig:
       args:
         - --labels="kca/control-plane=true"
-      downloadURL: "https://github.com/k0sproject/k0s/releases/download/v1.32.6+k0s.0/k0s-v1.32.6+k0s.0-amd64"
+      downloadURL: "https://github.com/k0sproject/k0s/releases/download/v1.35.4+k0s.0/k0s-v1.35.4+k0s.0-amd64"
       k0s: {}
       postStartCommands: []
       preInstallCommands: []
