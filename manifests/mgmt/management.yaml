@@ -17,6 +17,20 @@ spec:
   # Only enable providers we need to reduce startup time and resource usage
   - name: cluster-api-provider-hetzner
     template: cluster-api-provider-hetzner-0-0-27  # Custom CAPH with diagnostics flags
+  # StackIT (enopax/enopax#51). Absichtlich aus: dieser Eintrag **installiert**
+  # CAPSTK, und CAPSTK ist v0.1.0-alpha.5 und ausdruecklich kein von StackIT
+  # unterstuetztes Projekt. Einschalten gehoert in ein Wartungsfenster,
+  # zusammen mit Credential und Secret - nicht in ein `kubectl apply` neben
+  # anderen Aenderungen.
+  #
+  # Reihenfolge, wenn es soweit ist:
+  #   1. stackit-secret.yaml (envsubst) und stackit-credential.yaml anwenden
+  #   2. stackit-resource-template.yaml anwenden
+  #   3. helm-enopax-charts-repo.yaml und stackit-providertemplate.yaml anwenden
+  #   4. diese Zeile einkommentieren und Management abwarten
+  #   5. die beiden ClusterTemplates anwenden
+  # - name: cluster-api-provider-stackit
+  #   template: cluster-api-provider-stackit-0-1-0
   # Commented out unused providers:
   # - name: cluster-api-provider-docker
   # - name: cluster-api-provider-azure

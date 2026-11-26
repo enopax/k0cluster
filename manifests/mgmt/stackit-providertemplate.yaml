@@ -1,0 +1,22 @@
+# CAPSTK als k0rdent-Provider.
+#
+# Noch nicht in Management.spec.providers eingetragen - siehe management.yaml.
+# Diese Vorlage anzulegen installiert nichts; erst der Eintrag dort tut es.
+apiVersion: k0rdent.mirantis.com/v1beta1
+kind: ProviderTemplate
+metadata:
+  name: cluster-api-provider-stackit-0-1-0
+  labels:
+    k0rdent.mirantis.com/component: kcm
+    app.kubernetes.io/managed-by: Helm
+    helm.toolkit.fluxcd.io/name: cluster-api-provider-stackit
+    helm.toolkit.fluxcd.io/namespace: kcm-system
+spec:
+  helm:
+    chartSpec:
+      chart: cluster-api-provider-stackit
+      version: 0.1.0
+      interval: 10m
+      sourceRef:
+        kind: HelmRepository
+        name: enopax-charts-repo

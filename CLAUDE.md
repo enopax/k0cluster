@@ -27,6 +27,10 @@ This repository provides Helm charts, manifests, and automation scripts for depl
 ├── manifests/                              # Kubernetes manifests
 │   ├── mgmt/                               # Management cluster resources
 │   │   ├── management.yaml                 # k0rdent Management resource
+│   │   ├── stackit-*.yaml                  # STACKIT: provider, credential,
+│   │   │                                   #   Sveltos resource template,
+│   │   │                                   #   cluster templates (not applied,
+│   │   │                                   #   see docs/stackit.md)
 │   │   ├── helm-custom-repo.yaml           # HelmRepository for custom charts
 │   │   ├── hetzner-providertemplate.yaml   # CAPH ProviderTemplate
 │   │   ├── hetzner-clustertemplate.yaml    # ClusterTemplate

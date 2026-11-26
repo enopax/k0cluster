@@ -1,0 +1,36 @@
+# Wie der Schluessel in den Kindcluster kommt.
+#
+# Derselbe Weg wie bei Hetzner (hetzner-resource-template.yaml): eine
+# ConfigMap, die Sveltos als Vorlage rendert, benannt nach dem
+# Identity-Secret des Credentials plus `-resource-template`. KCM nimmt sie
+# mit, wenn es das Credential an einen Kindcluster weitergibt; `getResource
+# "InfrastructureProviderIdentity"` liefert dabei das Secret aus dem
+# Management-Cluster.
+#
+# Warum ueberhaupt: CCM und CSI laufen **im Kind** und brauchen den
+# Service-Account-Schluessel dort. Ueber die Werte des ClusterDeployment
+# duerfte er nicht gehen - dann stuende er im Klartext im Objekt, das jeder
+# mit Leserecht auf kcm-system sieht.
+#
+# Die Namen `stackit-cloud-secret` und `sa_key.json` sind die, die das Chart
+# cloud-provider-stackit erwartet (credentials.secretName / credentials.key).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stackit-eu01-credentials-resource-template
+  namespace: kcm-system
+  labels:
+    k0rdent.mirantis.com/component: kcm
+  annotations:
+    projectsveltos.io/template: "true"
+data:
+  stackit-cloud-secret.yaml: |
+    {{- $identity := (getResource "InfrastructureProviderIdentity") -}}
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: stackit-cloud-secret
+      namespace: kube-system
+    type: Opaque
+    data:
+      sa_key.json: {{ index $identity.data "serviceaccount.json" }}
