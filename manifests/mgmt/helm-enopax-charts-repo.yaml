@@ -1,0 +1,19 @@
+# Eine HelmRepository fuer alle StackIT-Charts.
+#
+# Zwei Schreibweisen sind hier im Umlauf, und das ist kein Versehen, das jemand
+# "aufraeumen" sollte: die Hetzner-Charts liegen je Chart in einem eigenen
+# OCI-Pfad (`oci://ghcr.io/enopax/hetzner-standalone-cp`), die
+# StackIT-Charts und caph-helm liegen zusammen unter
+# `oci://ghcr.io/enopax/charts`. Beide sind in sich gueltig - entscheidend ist,
+# dass `url` zu dem passt, wohin der Release-Workflow des Charts schiebt.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: enopax-charts-repo
+  namespace: kcm-system
+  labels:
+    k0rdent.mirantis.com/managed: "true"
+spec:
+  url: oci://ghcr.io/enopax/charts
+  type: oci
+  interval: 10m
